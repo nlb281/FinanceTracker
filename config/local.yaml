@@ -1,0 +1,7 @@
+env: "local"
+storage_path: "storage/finance.db"
+migration_path: "migrations/001_init.sql"
+http_server:
+  address: "localhost:8080"
+  timeout: 4s
+  idle_timeout: 60s
