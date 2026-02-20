@@ -1,0 +1,30 @@
+.records-page {
+  min-height: 100vh;
+  padding-block: 28px;
+}
+
+.records-page__header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.records-page__title {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.records-page__add-button {
+  font-size: 14px;
+  color: $white;
+  font-weight: 600;
+  border-radius: 50px;
+  border: 1px solid $line-color;
+  padding: 12px 38px;
+  transition-duration: $transition-duration;
+}
+
+.records-page__add-button:hover {
+  background-color: $white;
+  color: $background;
+}
