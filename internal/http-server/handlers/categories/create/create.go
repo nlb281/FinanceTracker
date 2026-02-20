@@ -3,11 +3,13 @@ package create
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
 	"strings"
 
 	"financetracker/internal/models"
+	"financetracker/internal/repo"
 )
 
 type CategoryCreator interface {
@@ -47,6 +49,12 @@ func New(creator CategoryCreator) http.HandlerFunc {
 
 		id, err := creator.Create(r.Context(), &input)
 		if err != nil {
+			if errors.Is(err, repo.ErrCategoryAlreadyExists) {
+				slog.Info("category already exists", "op", op, "name", input.Name)
+				writeJSON(w, http.StatusConflict, Response{Status: "error", Error: "category already exists"})
+				return
+			}
+
 			slog.Info("create category failed", "op", op, "error", err)
 			writeJSON(w, http.StatusInternalServerError, Response{Status: "error", Error: "failed to create category"})
 			return

@@ -25,6 +25,12 @@ func (r *CategoryRepo) Create(ctx context.Context, c *models.Category) (int64, e
 	const q = `INSERT INTO categories(name, type) VALUES(?, ?)`
 	res, err := r.db.ExecContext(ctx, q, c.Name, c.Type)
 	if err != nil {
+		var sqlErr *sqliteDriver.Error
+		if errors.As(err, &sqlErr) &&
+			sqlErr.Code()&0xFF == sqlite3.SQLITE_CONSTRAINT &&
+			strings.Contains(err.Error(), "UNIQUE constraint failed: categories.name") {
+			return 0, ErrCategoryAlreadyExists
+		}
 		return 0, fmt.Errorf("create category: %w", err)
 	}
 	id, err := res.LastInsertId()
