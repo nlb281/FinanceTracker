@@ -3,10 +3,12 @@ package repo
 import (
 	"context"
 	"database/sql"
-	"fmt"
-
+	"errors"
 	"financetracker/internal/db"
 	"financetracker/internal/models"
+	"fmt"
+
+	sqliteDriver "modernc.org/sqlite"
 )
 
 type CategoryRepo struct {
@@ -69,9 +71,14 @@ func (r *CategoryRepo) List(ctx context.Context) ([]models.Category, error) {
 
 func (r *CategoryRepo) Delete(ctx context.Context, id int64) (error) {
 	const q = "DELETE FROM categories WHERE id = ?"
+	const sqliteConstraintForeignKey = 787 // SQLITE_CONSTRAINT_FOREIGNKEY
 
 	result, err := r.db.ExecContext(ctx, q, id)
 	if err != nil {
+		var sqlErr *sqliteDriver.Error
+		if errors.As(err, &sqlErr) && sqlErr.Code() == sqliteConstraintForeignKey {
+			return ErrCategoryInUse
+		}
 		return fmt.Errorf("delete category: %w", err)
 	}
 

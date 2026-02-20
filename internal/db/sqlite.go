@@ -24,14 +24,17 @@ func Open(dbPath string) (*Storage, error) {
 		}
 	}
 
-	database, err := sql.Open("sqlite", dbPath)
-	if err != nil {
-		return nil, fmt.Errorf("open sqlite: %w", err)
+	var dsn string
+
+	if dbPath == ":memory:" {
+		dsn = "file::memory:?_pragma=foreign_keys(1)"
+	} else {
+		dsn = fmt.Sprintf("file:%s?_pragma=foreign_keys(1)", dbPath)
 	}
 
-	if _, err := database.Exec(`PRAGMA foreign_keys = ON;`); err != nil {
-		_ = database.Close()
-		return nil, fmt.Errorf("enable foreign keys: %w", err)
+	database, err := sql.Open("sqlite", dsn)
+	if err != nil {
+		return nil, fmt.Errorf("open sqlite: %w", err)
 	}
 
 	if err := database.Ping(); err != nil {

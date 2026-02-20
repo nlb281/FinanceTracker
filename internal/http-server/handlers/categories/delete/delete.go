@@ -42,6 +42,11 @@ func New(deleter CategoryDeleter) http.HandlerFunc {
 				writeJSON(w, http.StatusNotFound, Response{Status: "error", Error: "category not found"})
 				return
 			}
+			if errors.Is(err, repo.ErrCategoryInUse) {
+				slog.Info("category is used in transactions", "op", op, "id", id)
+				writeJSON(w, http.StatusConflict, Response{Status: "error", Error: "category is used in transactions"})
+				return
+			}
 
 			slog.Info("failed to delete category", "op", op, "id", id, "error", err)
 			writeJSON(w, http.StatusInternalServerError, Response{Status: "error", Error: "internal error"})
