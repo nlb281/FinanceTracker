@@ -7,8 +7,10 @@ import (
 	"financetracker/internal/db"
 	"financetracker/internal/models"
 	"fmt"
+	"strings"
 
 	sqliteDriver "modernc.org/sqlite"
+	sqlite3 "modernc.org/sqlite/lib"
 )
 
 type CategoryRepo struct {
@@ -76,7 +78,9 @@ func (r *CategoryRepo) Delete(ctx context.Context, id int64) (error) {
 	result, err := r.db.ExecContext(ctx, q, id)
 	if err != nil {
 		var sqlErr *sqliteDriver.Error
-		if errors.As(err, &sqlErr) && sqlErr.Code() == sqliteConstraintForeignKey {
+		if errors.As(err, &sqlErr) &&
+		sqlErr.Code()&0xFF == sqlite3.SQLITE_CONSTRAINT &&
+		strings.Contains(err.Error(), "FOREIGN KEY constraint failed") {
 			return ErrCategoryInUse
 		}
 		return fmt.Errorf("delete category: %w", err)
