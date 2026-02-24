@@ -19,6 +19,7 @@ import (
 	trxdelete "financetracker/internal/http-server/handlers/transactions/delete"
 	trxgetbyid "financetracker/internal/http-server/handlers/transactions/getbyid"
 	trxlist "financetracker/internal/http-server/handlers/transactions/list"
+	trxupdate "financetracker/internal/http-server/handlers/transactions/update"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -67,6 +68,9 @@ func run() error {
 	router.Get("/transactions", trxlist.New(transactionRepo))
 	router.Get("/transactions/{id}", trxgetbyid.New(transactionRepo))
 	router.Delete("/transactions/{id}", trxdelete.New(transactionRepo))
+	// cmd/api/main.go (роут)
+router.Patch("/transactions/{id}", trxupdate.New(transactionRepo, transactionRepo))
+
 
 
 	

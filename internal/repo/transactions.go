@@ -85,3 +85,27 @@ func (r *TransactionsRepo) Delete(ctx context.Context, id int64) (error) {
 
 	return nil
 }
+
+func (r *TransactionsRepo) Update(ctx context.Context, t *models.Transaction) error {
+	if t == nil {
+		return fmt.Errorf("update transaction: nil transaction")
+	}
+	
+	const q = "UPDATE transactions SET amount = ?, date = ?, description = ? WHERE id = ?"
+
+	res, err := r.db.ExecContext(ctx, q, t.Amount, t.Date, t.Description, t.ID)
+	if err != nil {
+		return fmt.Errorf("update transaction: %w", err)
+	}
+
+	n, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("update transaction rows affected: %w", err)
+	}
+
+	if n == 0 {
+		return ErrTransactionNotFound
+	}
+
+	return nil
+}
