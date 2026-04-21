@@ -33,8 +33,6 @@ func main() {
 		)
 		os.Exit(1)
 	}
-
-	
 }
 
 func run() error {
@@ -69,11 +67,7 @@ func run() error {
 	router.Get("/transactions/{id}", trxgetbyid.New(transactionRepo))
 	router.Delete("/transactions/{id}", trxdelete.New(transactionRepo))
 	// cmd/api/main.go (роут)
-router.Patch("/transactions/{id}", trxupdate.New(transactionRepo, transactionRepo))
-
-
-
-	
+	router.Patch("/transactions/{id}", trxupdate.New(transactionRepo, transactionRepo))
 
 	srv := &http.Server{
 		Addr:    cfg.HTTPServer.Address,
